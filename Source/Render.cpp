@@ -10,6 +10,59 @@ void Render::Renderer::AddToFrameBuffer(Common::PixelColor APixel)
 	this->FrameBuffer.push_back(APixel);
 }
 
+void Render::Renderer::RenderLine(Common::PixelPos Start, Common::PixelPos End, Common::Color Color)
+{
+	int x0 = Start.X, x1 = End.X;
+	int y0 = Start.Y, y1 = End.Y;
+    bool KGreaterThanOne = abs(x0 - x1) < abs(y0 - y1);
+	
+	if (KGreaterThanOne)
+	{
+		std::swap<int>(x0, y0);
+		std::swap<int>(x1, y1);
+	}
+
+	if (x0 > x1)
+	{
+		std::swap<int>(x0, x1);
+		std::swap<int>(y0, y1);
+	}
+
+	int YStep;
+	if (y0 < y1)
+	{
+		YStep = 1;
+	}
+	else
+	{
+		YStep = -1;
+	}
+
+	int Dy = abs(y1 - y0);
+	int Dx = x1 - x0;
+	int e = -1 * Dx;
+
+	for (int index = x0; index <= x1; ++index)
+	{
+		if (KGreaterThanOne)
+		{
+			Common::PixelColor APixel(y0, index, Color);
+			AddToFrameBuffer(APixel);
+		}
+		else
+		{
+			Common::PixelColor APixel(index, y0, Color);
+			AddToFrameBuffer(APixel);
+		}
+		e += Dy * 2;
+		if (e > 0)
+		{
+			y0 += YStep;
+			e += -2 * Dx;
+		}
+	}
+}
+
 GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, int height)
 {
 

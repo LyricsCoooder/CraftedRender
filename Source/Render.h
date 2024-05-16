@@ -20,6 +20,8 @@ namespace Render
 		// AddToFrameBuffer
 		void AddToFrameBuffer(Common::PixelColor APixel);
 
+		void RenderLine(Common::PixelPos Start, Common::PixelPos End, Common::Color Color);
+
 		GLuint CreateGradientTexture(unsigned char* data, int width, int height);
 
 		// FinalRender

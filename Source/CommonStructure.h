@@ -13,6 +13,7 @@ namespace Common
 		Color();
 		Color(float R, float G, float B);
 		Color(float R, float G, float B, float A);
+		Color(float Color[4]);
 	};
 
 	class PixelPos
@@ -23,6 +24,7 @@ namespace Common
 	public:
 		PixelPos();
 		PixelPos(int X, int Y);
+		PixelPos(float Pos[2]);
 	};
 
 
@@ -33,6 +35,7 @@ namespace Common
 		Color Color;
 	public:
 		PixelColor();
+		PixelColor(PixelPos Pos, Common::Color Color);
 		PixelColor(int X, int Y, Common::Color Color);
 	};
 }

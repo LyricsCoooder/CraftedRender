@@ -7,7 +7,14 @@ namespace UIValue
 	struct Point
 	{
 		float Pos[2] = { 0.0f };
-		float Color[4] = { 0.0f, 0.0f, 0.0f, 1.0f};
+		float Color[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
+	};
+
+	struct Line
+	{
+		float StartPos[2] = { 0.0f };
+		float EndPos[2] = { 0.0f };
+		float Color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
 	class UIValue
@@ -16,6 +23,10 @@ namespace UIValue
 		// PointTree
 		std::vector<Point> PointTree;
 		int PointTreeSize = 0;
+
+		// PointTree
+		std::vector<Line> LineTree;
+		int LineTreeSize = 0;
 
 	public:
 		UIValue();

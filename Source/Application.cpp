@@ -1,6 +1,21 @@
 #include "Application.h"
 
 void RenderApp::RenderUI(UIValue::UIValue& MainUIValue)
+{   
+    RenderDocking();
+
+    // Render Settings
+    RenderSetting(MainUIValue);
+
+    Render::Renderer ViewportRender;
+    // Render Sense
+    RenderSense(MainUIValue, ViewportRender);
+
+    // Show Demo Window
+    ImGui::ShowDemoWindow();
+}
+
+void RenderApp::RenderDocking()
 {
     static bool opt_fullscreen = true;
     static bool opt_padding = false;
@@ -24,16 +39,9 @@ void RenderApp::RenderUI(UIValue::UIValue& MainUIValue)
         dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
     }
 
-    // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
-    // and handle the pass-thru hole, so we ask Begin() to not render a background.
     if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
         window_flags |= ImGuiWindowFlags_NoBackground;
 
-    // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-    // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-    // all active windows docked into it will lose their parent and become undocked.
-    // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-    // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     if (!opt_padding)
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("DockSpace Demo", nullptr, window_flags);
@@ -73,33 +81,26 @@ void RenderApp::RenderUI(UIValue::UIValue& MainUIValue)
 
         ImGui::EndMenuBar();
     }
-
-    Render::Renderer ViewportRender;
-
-    RenderSetting(MainUIValue);
-    
-    RenderSense(MainUIValue, ViewportRender);
-
-    // Show Demo Window
-    ImGui::ShowDemoWindow();
     ImGui::End();
 }
-
-struct Point {
-    float Pos[2] = { 0.0f };
-    float Color[4] = { 0.0f };
-};
-int PointNum = 0;
-std::vector<Point> Points(10);
 
 void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
 {
     ImGui::Begin("Settings");
+    //ImVec4 button_color = ImVec4(0.3f, 0.5f, 0.8f, 1.0f);
+    //ImGui::PushStyleColor(ImGuiCol_Button, button_color);
+    // RenderPointTreeUI    
+    RenderPointTreeUI(MainUIValue);
+    RenderLineTreeUI(MainUIValue);
+    
+    ImGui::End();
+}
 
+void RenderApp::RenderPointTreeUI(UIValue::UIValue& MainUIValue)
+{
     // Add Points 
-    ImGui::Text("Points");
+    ImGui::SeparatorText("Points");
 
-    ImGui::SameLine();
     if (ImGui::Button("Add Point"))
     {
         MainUIValue.PointTreeSize++;
@@ -111,11 +112,11 @@ void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
         ImGui::PushID(i);
         if (ImGui::TreeNode("", "Point%d", i))
         {
+            bool RemoveButton = ImGui::Button("Remove");
             ImGui::InputFloat2("Position", MainUIValue.PointTree[i].Pos);
-
             ImGui::ColorEdit4("Color", MainUIValue.PointTree[i].Color);
 
-            if (ImGui::Button("Remove"))
+            if (RemoveButton)
             {
                 MainUIValue.PointTree.erase(MainUIValue.PointTree.begin() + i);
                 MainUIValue.PointTreeSize--;
@@ -126,22 +127,69 @@ void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
         }
         ImGui::PopID();
     }
+}
 
-    ImGui::End();
+void RenderApp::RenderPointTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
+{
+    // PointTree Render
+    for (UIValue::Point& Point : MainUIValue.PointTree)
+    {
+ /*       Common::PixelColor TempPixelColor = Common::PixelColor((int)Point.Pos[0], (int)Point.Pos[1],
+            Common::Color(Point.Color[0], Point.Color[1], Point.Color[2], Point.Color[3]));*/
+        ViewportRender.AddToFrameBuffer(Common::PixelColor(Point.Pos, Point.Color));
+    }
+}
+
+void RenderApp::RenderLineTreeUI(UIValue::UIValue& MainUIValue)
+{
+    ImGui::SeparatorText("Lines");
+
+    if (ImGui::Button("Add Line"))
+    {
+        MainUIValue.LineTreeSize++;
+        MainUIValue.LineTree.push_back(UIValue::Line());
+    }
+
+    for (int i = 0; i < MainUIValue.LineTreeSize; i++)
+    {
+        ImGui::PushID(MainUIValue.PointTreeSize + i);
+        if (ImGui::TreeNode("", "Line%d", i))
+        {
+            bool RemoveButton = ImGui::Button("Remove");
+            ImGui::InputFloat2("Start Pos", MainUIValue.LineTree[i].StartPos);
+            ImGui::InputFloat2("End Pos", MainUIValue.LineTree[i].EndPos);
+            ImGui::ColorEdit4("Color", MainUIValue.LineTree[i].Color);
+
+            if (RemoveButton)
+            {
+                MainUIValue.LineTree.erase(MainUIValue.LineTree.begin() + i);
+                MainUIValue.LineTreeSize--;
+                i--;
+            }
+
+            ImGui::TreePop();
+        }
+        ImGui::PopID();
+    }
+}
+
+void RenderApp::RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
+{
+    // LineTree Render
+    for (UIValue::Line& Line : MainUIValue.LineTree)
+    {
+        ViewportRender.RenderLine(Line.StartPos, Line.EndPos, Line.Color);
+    }
 }
 
 void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Sence");
 
-    // PointTree Render
-    for (UIValue::Point Point : MainUIValue.PointTree)
-    {
-        Common::PixelColor TempPixelColor = Common::PixelColor((int)Point.Pos[0], (int)Point.Pos[1],
-                                                    Common::Color(Point.Color[0], Point.Color[1], Point.Color[2], Point.Color[3]));
-        ViewportRender.AddToFrameBuffer(TempPixelColor);
-    }
-
+    // RenderPointTreeToSense
+    RenderPointTreeToSense(MainUIValue, ViewportRender);
+    // RenderLineTreeToSense
+    RenderLineTreeToSense(MainUIValue, ViewportRender);
 
     ViewportRender.FinalRender();
 
