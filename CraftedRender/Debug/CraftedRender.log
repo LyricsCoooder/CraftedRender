@@ -1,0 +1,22 @@
+﻿  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  main.cpp
+  Application.cpp
+  CommonStructure.cpp
+C:\Dev\CraftedRender\Source\CommonStructure.cpp(30,12): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Dev\CraftedRender\Source\CommonStructure.cpp(31,12): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  Render.cpp
+  Generating Code...
+  gl3w.c
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4217: symbol '_sscanf' defined in 'imgui_impl_opengl3.obj' is imported by 'glfw3.lib(context.obj)' in function '_parseVersionString'
+LINK : warning LNK4286: symbol '__vsnprintf' defined in 'imgui.obj' is imported by 'MSVCRTD.lib(vsnprintf.obj)'
+glfw3.lib(init.obj) : error LNK2019: unresolved external symbol __imp__vsnprintf referenced in function __glfwInputError
+MSVCRTD.lib(vsnprintf.obj) : error LNK2001: unresolved external symbol __imp__vsnprintf
+.\libs\glfw\lib-vc2010-64\glfw3.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
+C:\Dev\CraftedRender\Debug\CraftedRender.exe : fatal error LNK1120: 1 unresolved externals
