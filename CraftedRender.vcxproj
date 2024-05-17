@@ -142,6 +142,7 @@
     <ClCompile Include="backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\ImGuiFileDialog.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
@@ -156,8 +157,11 @@
     <ClInclude Include="backends\imgui_impl_glfw.h" />
     <ClInclude Include="backends\imgui_impl_opengl3.h" />
     <ClInclude Include="backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="imgui\dirent\dirent.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\ImGuiFileDialog.h" />
+    <ClInclude Include="imgui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="imgui\imgui_internal.h" />
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
@@ -175,6 +179,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Font\Roboto-Bold.ttf" />
+    <Font Include="Font\Roboto-Light.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

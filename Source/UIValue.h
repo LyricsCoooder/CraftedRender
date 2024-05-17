@@ -1,7 +1,8 @@
 #pragma once
 
 #include "vector"
-//#include "CommonStructure.h"
+#include "CommonStructure.h"
+
 namespace UIValue
 {
 	struct Point
@@ -28,6 +29,9 @@ namespace UIValue
 		std::vector<Line> LineTree;
 		int LineTreeSize = 0;
 
+		// ModelTree
+		std::vector<Common::Model> ModelTree;
+		int ModelTreeSize = 0;
 	public:
 		UIValue();
 	};

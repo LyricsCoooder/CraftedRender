@@ -1,4 +1,6 @@
 #include "CommonStructure.h"
+#include <fstream>
+#include <sstream>
 
 Common::Color::Color()
 {
@@ -67,4 +69,38 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 {
 	this->Pos = PixelPos(X, Y);
 	this->Color = Color;
+}
+
+ Common::Model Common::Model::readObj(std::string filename)
+{
+	Model AnsModel;
+
+	std::ifstream file(filename);
+
+	std::string line;
+	while (std::getline(file, line)) {
+		std::istringstream ss(line);
+		std::string prefix;
+		ss >> prefix;
+
+		if (prefix == "v") {
+			Vertex vertex;
+			ss >> vertex.x >> vertex.y >> vertex.z;
+			AnsModel.Vertices.push_back(vertex);
+		}
+		else if (prefix == "vn") {
+			Normal normal;
+			ss >> normal.x >> normal.y >> normal.z;
+			AnsModel.Normals.push_back(normal);
+		}
+		else if (prefix == "vt") {
+			TexCoord texCoord;
+			ss >> texCoord.u >> texCoord.v;
+			AnsModel.TexCoords.push_back(texCoord);
+		}
+	}
+
+	file.close();
+
+	return AnsModel;
 }

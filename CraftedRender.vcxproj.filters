@@ -51,6 +51,9 @@
     <ClCompile Include="Source\UIValue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="imgui\ImGuiFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_glfw.h">
@@ -98,6 +101,15 @@
     <ClInclude Include="Source\UIValue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\ImGuiFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\ImGuiFileDialogConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\dirent\dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\glfw\lib-vc2010-32\glfw3.lib" />
@@ -105,5 +117,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Font\Roboto-Bold.ttf" />
+    <Font Include="Font\Roboto-Light.ttf" />
   </ItemGroup>
 </Project>

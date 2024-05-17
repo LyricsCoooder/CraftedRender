@@ -5,6 +5,11 @@ std::vector<Common::PixelColor> Render::Renderer::GetFrameBuffer()
 	return FrameBuffer;
 }
 
+void Render::Renderer::ClearFrameBuffer()
+{
+	FrameBuffer.clear();
+}
+
 void Render::Renderer::AddToFrameBuffer(Common::PixelColor APixel)
 {
 	this->FrameBuffer.push_back(APixel);
@@ -65,7 +70,6 @@ void Render::Renderer::RenderLine(Common::PixelPos Start, Common::PixelPos End, 
 
 GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, int height)
 {
-
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -83,10 +87,10 @@ GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, i
 void Render::Renderer::FinalRender()
 {
 	ImVec2 WindowSize = ImGui::GetWindowSize();
-    const int height = (int) WindowSize.y - 35;
-    const int width = (int) WindowSize.x;
+    const int height = (int) WindowSize.y - 42;
+    const int width = (int) WindowSize.x - 16;
     ImVec2 ImageSize = ImVec2((float)width, (float)height);
-
+	 
     int DataSize = height * width * 4;
     unsigned char* data = new unsigned char[DataSize] (); // RGBA∏Ò Ω
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "vector"
+#include "string"
+
 namespace Common
 {
 	class Color
@@ -27,7 +30,6 @@ namespace Common
 		PixelPos(float Pos[2]);
 	};
 
-
 	class PixelColor
 	{
 	public:
@@ -37,5 +39,30 @@ namespace Common
 		PixelColor();
 		PixelColor(PixelPos Pos, Common::Color Color);
 		PixelColor(int X, int Y, Common::Color Color);
+	};
+
+	struct Vertex 
+	{
+		float x, y, z;
+	};
+
+	struct Normal 
+	{
+		float x, y, z;
+	};
+
+	struct TexCoord 
+	{
+		float u, v;
+	};
+
+	class Model
+	{
+	public:
+		std::vector<Vertex> Vertices;
+		std::vector<Normal> Normals;
+		std::vector<TexCoord> TexCoords;
+
+		static Model readObj(std::string filename);
 	};
 }

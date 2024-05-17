@@ -17,6 +17,9 @@ namespace Render
 		// GetFrameBuffer
 		std::vector<Common::PixelColor> GetFrameBuffer();
 
+		// Clean FrameBuffer
+		void  ClearFrameBuffer();
+
 		// AddToFrameBuffer
 		void AddToFrameBuffer(Common::PixelColor APixel);
 

@@ -6,6 +6,7 @@
 // My Libs
 #include "Application.h"
 #include "UIValue.h"
+#include "Render.h"
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
@@ -27,7 +28,6 @@ int main(int, char**)
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 
     // Create window with graphics context
     GLFWwindow* window = glfwCreateWindow(1280, 720, "CraftedRender", nullptr, nullptr);
@@ -44,14 +44,12 @@ int main(int, char**)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-    //io.ConfigViewportsNoAutoMerge = true;
-    //io.ConfigViewportsNoTaskBarIcon = true;
 
     // Load font
     io.Fonts->AddFontFromFileTTF("./Font/Roboto-Bold.ttf", 20.0f);
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
 
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     ImGuiStyle& style = ImGui::GetStyle();
@@ -69,6 +67,8 @@ int main(int, char**)
 
     // UIValue
     UIValue::UIValue MainUIValue;
+    // Renderer
+    Render::Renderer ViewportRender;
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -80,7 +80,7 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        RenderApp::RenderUI(MainUIValue);
+        RenderApp::RenderUI(MainUIValue, ViewportRender);
 
         // Rendering
         ImGui::Render();

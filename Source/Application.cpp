@@ -1,13 +1,14 @@
 #include "Application.h"
+#include "ImGuiFileDialog.h"
+#include "iostream"
 
-void RenderApp::RenderUI(UIValue::UIValue& MainUIValue)
+void RenderApp::RenderUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {   
     RenderDocking();
 
     // Render Settings
     RenderSetting(MainUIValue);
 
-    Render::Renderer ViewportRender;
     // Render Sense
     RenderSense(MainUIValue, ViewportRender);
 
@@ -87,12 +88,13 @@ void RenderApp::RenderDocking()
 void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
 {
     ImGui::Begin("Settings");
-    //ImVec4 button_color = ImVec4(0.3f, 0.5f, 0.8f, 1.0f);
-    //ImGui::PushStyleColor(ImGuiCol_Button, button_color);
     // RenderPointTreeUI    
     RenderPointTreeUI(MainUIValue);
+    // RenderTreeUI
     RenderLineTreeUI(MainUIValue);
     
+    RenderModelTreeUI(MainUIValue);
+
     ImGui::End();
 }
 
@@ -182,10 +184,61 @@ void RenderApp::RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Ren
     }
 }
 
+void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
+{
+    ImGui::SeparatorText("Models");
+
+    if (ImGui::Button("Import Model"))
+    {
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Model", ".obj");
+    }
+
+    // 显示文件对话框并处理选择结果
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+    {
+        // 如果用户选择了文件
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            // 获取选择的文件路径
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::cout << filePathName << std::endl;
+            MainUIValue.ModelTree.push_back(Common::Model::readObj(filePathName));
+            MainUIValue.ModelTreeSize++;
+        }
+
+        // 关闭文件对话框
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+
+    for (int i = 0; i < MainUIValue.ModelTreeSize; i++)
+    {
+        ImGui::PushID(MainUIValue.LineTreeSize + i);
+        if (ImGui::TreeNode("", "Model%d", i))
+        {
+            bool RemoveButton = ImGui::Button("Remove");
+            ImGui::Text("TexCoords Size: %d", MainUIValue.ModelTree[i].TexCoords.size());
+            ImGui::Text("Normals Size: %d", MainUIValue.ModelTree[i].Normals.size());
+            ImGui::Text("Vertices Size: %d", MainUIValue.ModelTree[i].Vertices.size());
+
+            if (RemoveButton)
+            {
+                MainUIValue.ModelTree.erase(MainUIValue.ModelTree.begin() + i);
+                MainUIValue.ModelTreeSize--;
+                i--;
+            }
+
+            ImGui::TreePop();
+        }
+        ImGui::PopID();
+    }
+}
+
 void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Sence");
 
+    ViewportRender.ClearFrameBuffer();
     // RenderPointTreeToSense
     RenderPointTreeToSense(MainUIValue, ViewportRender);
     // RenderLineTreeToSense

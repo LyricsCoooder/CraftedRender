@@ -7,7 +7,7 @@
 namespace RenderApp
 {
 	// Main UI
-	void RenderUI(UIValue::UIValue& MainUIValue);
+	void RenderUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 	// Render Doking
 	void RenderDocking();
 	// Setting 
@@ -18,8 +18,9 @@ namespace RenderApp
 	void RenderPointTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 
 	void RenderLineTreeUI(UIValue::UIValue& MainUIValue);
-
 	void RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
+
+	void RenderModelTreeUI(UIValue::UIValue& MainUIValue);
 	// Render View Port
 	void RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 }
