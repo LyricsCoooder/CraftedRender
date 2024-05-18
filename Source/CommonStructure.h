@@ -56,13 +56,39 @@ namespace Common
 		float u, v;
 	};
 
+	struct VertexIndex
+	{
+		int Indexs[3] = { 0 };
+	public:
+		VertexIndex(std::vector<int> Indexs);
+	};
+
+	struct NormalIndex
+	{
+		int Indexs[3] = { 0 };
+	public:
+		NormalIndex(std::vector<int> Indexs);
+	};
+
+	struct TexCoordIndex
+	{
+		int Indexs[3] = { 0 };
+	public:
+		TexCoordIndex(std::vector<int> Indexs);
+	};
+
 	class Model
 	{
 	public:
 		std::vector<Vertex> Vertices;
 		std::vector<Normal> Normals;
 		std::vector<TexCoord> TexCoords;
+		std::vector<VertexIndex> VertexIndexs;
+		std::vector<NormalIndex> NormalIndexs;
+		std::vector<TexCoordIndex> TexCoordIndexs;
 
 		static Model readObj(std::string filename);
+
+		void LogModel();
 	};
 }

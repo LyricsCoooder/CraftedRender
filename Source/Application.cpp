@@ -216,6 +216,11 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
         ImGui::PushID(MainUIValue.LineTreeSize + i);
         if (ImGui::TreeNode("", "Model%d", i))
         {
+            if (ImGui::Button("Log Model"))
+            {
+                MainUIValue.ModelTree[i].LogModel();
+            }
+            ImGui::SameLine();
             bool RemoveButton = ImGui::Button("Remove");
             ImGui::Text("TexCoords Size: %d", MainUIValue.ModelTree[i].TexCoords.size());
             ImGui::Text("Normals Size: %d", MainUIValue.ModelTree[i].Normals.size());
