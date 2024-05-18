@@ -93,7 +93,10 @@ void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
     // RenderTreeUI
     RenderLineTreeUI(MainUIValue);
     
+    RenderTriangleTreeUI(MainUIValue);
+
     RenderModelTreeUI(MainUIValue);
+
 
     ImGui::End();
 }
@@ -184,6 +187,48 @@ void RenderApp::RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Ren
     }
 }
 
+void RenderApp::RenderTriangleTreeUI(UIValue::UIValue& MainUIValue)
+{
+    ImGui::SeparatorText("Triangles");
+
+    if (ImGui::Button("Add Triangle"))
+    {
+        MainUIValue.TriangleTreeSize++;
+        MainUIValue.TriangleTree.push_back(UIValue::Triangle());
+    }
+
+    for (int i = 0; i < MainUIValue.TriangleTreeSize; i++)
+    {
+        ImGui::PushID(MainUIValue.TriangleTreeSize + i);
+        if (ImGui::TreeNode("", "Triangle%d", i))
+        {
+            bool RemoveButton = ImGui::Button("Remove");
+            ImGui::InputFloat2("Pos0", MainUIValue.TriangleTree[i].Pos0);
+            ImGui::InputFloat2("Pos1", MainUIValue.TriangleTree[i].Pos1);
+            ImGui::InputFloat2("Pos3", MainUIValue.TriangleTree[i].Pos2);
+            ImGui::ColorEdit4("Color", MainUIValue.TriangleTree[i].Color);
+
+            if (RemoveButton)
+            {
+                MainUIValue.TriangleTree.erase(MainUIValue.TriangleTree.begin() + i);
+                MainUIValue.TriangleTreeSize--;
+                i--;
+            }
+
+            ImGui::TreePop();
+        }
+        ImGui::PopID();
+    }
+}
+
+void RenderApp::RenderTriangleTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
+{
+    for (UIValue::Triangle& Triangle : MainUIValue.TriangleTree)
+    {
+        ViewportRender.RenderTriangle(Triangle.Pos0, Triangle.Pos1, Triangle.Pos2, Triangle.Color);
+    }
+}
+
 void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
 {
     ImGui::SeparatorText("Models");
@@ -213,7 +258,7 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
 
     for (int i = 0; i < MainUIValue.ModelTreeSize; i++)
     {
-        ImGui::PushID(MainUIValue.LineTreeSize + i);
+        ImGui::PushID(MainUIValue.TriangleTreeSize + i);
         if (ImGui::TreeNode("", "Model%d", i))
         {
             if (ImGui::Button("Log Model"))
@@ -239,6 +284,15 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
     }
 }
 
+void RenderApp::RenderModelTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
+{
+    // ModelTree Render
+    for (Common::Model& Model : MainUIValue.ModelTree)
+    {
+        ViewportRender.RenderModel(Model);
+    }
+}
+
 void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Sence");
@@ -248,7 +302,10 @@ void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& Vie
     RenderPointTreeToSense(MainUIValue, ViewportRender);
     // RenderLineTreeToSense
     RenderLineTreeToSense(MainUIValue, ViewportRender);
-
+    // RenderTriangleTreeToSense
+    RenderTriangleTreeToSense(MainUIValue, ViewportRender);
+    // RenderModelTreeToSense
+    RenderModelTreeToSense(MainUIValue, ViewportRender);
     ViewportRender.FinalRender();
 
     ImGui::End();

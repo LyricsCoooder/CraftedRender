@@ -25,6 +25,10 @@ namespace Render
 
 		void RenderLine(Common::PixelPos Start, Common::PixelPos End, Common::Color Color);
 
+		void RenderTriangle(Common::PixelPos Pos0, Common::PixelPos Pos1, Common::PixelPos Pos2, Common::Color Color);
+
+		void RenderModel(Common::Model& Model);
+
 		GLuint CreateGradientTexture(unsigned char* data, int width, int height);
 
 		// FinalRender

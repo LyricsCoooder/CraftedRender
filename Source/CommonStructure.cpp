@@ -194,6 +194,9 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 	 {
 		 std::cout << temp.Indexs[0] << " " << temp.Indexs[1] << " " << temp.Indexs[2] << std::endl;
 	 }
+
+	 std::cout << "ModelMatrix:" << std::endl;
+	 ModelMatrix.Log();
  }
 
  Common::VertexIndex::VertexIndex(std::vector<int> Indexs)
@@ -215,4 +218,117 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 	 this->Indexs[0] = Indexs[0];
 	 this->Indexs[1] = Indexs[1];
 	 this->Indexs[2] = Indexs[2];
+ }
+
+ Common::Matrix::Matrix(size_t rows, size_t cols) : rows(rows), cols(cols)
+ {
+	 data.resize(rows, std::vector<double>(cols, 0.0));
+ }
+
+ size_t Common::Matrix::getRows() const
+ {
+	 return rows;
+ }
+
+ size_t Common::Matrix::getCols() const
+ {
+	 return cols;
+ }
+
+ double& Common::Matrix::operator()(size_t row, size_t col)
+ {
+	 if (row >= rows || col >= cols) 
+	 {
+		 throw std::out_of_range("Index out of bounds");
+	 }
+	 return data[row][col];
+ }
+
+ const double& Common::Matrix::operator()(size_t row, size_t col) const
+ {
+	 if (row >= rows || col >= cols)
+	 {
+		 throw std::out_of_range("Index out of bounds");
+	 }
+	 return data[row][col];
+ }
+
+ Common::Matrix Common::Matrix::operator+(const Matrix& other) const
+ {
+	 if (rows != other.rows || cols != other.cols)
+	 {
+		 throw std::invalid_argument("Matrix dimensions must match for addition");
+	 }
+
+	 Matrix result(rows, cols);
+	 for (size_t i = 0; i < rows; ++i) 
+	 {
+		 for (size_t j = 0; j < cols; ++j) 
+		 {
+			 result(i, j) = data[i][j] + other(i, j);
+		 }
+	 }
+	 return result;
+ }
+
+ Common::Matrix Common::Matrix::operator-(const Matrix& other) const
+ {
+	 if (rows != other.rows || cols != other.cols) 
+	 {
+		 throw std::invalid_argument("Matrix dimensions must match for subtraction");
+	 }
+
+	 Matrix result(rows, cols);
+	 for (size_t i = 0; i < rows; ++i) 
+	 {
+		 for (size_t j = 0; j < cols; ++j)
+		 {
+			 result(i, j) = data[i][j] - other(i, j);
+		 }
+	 }
+	 return result;
+ }
+
+ Common::Matrix Common::Matrix::operator*(const Matrix& other) const
+ {
+	 if (cols != other.rows) 
+	 {
+		 throw std::invalid_argument("Matrix dimensions must match for multiplication");
+	 }
+
+	 Matrix result(rows, other.cols);
+	 for (size_t i = 0; i < rows; ++i) 
+	 {
+		 for (size_t j = 0; j < other.cols; ++j)
+		 {
+			 for (size_t k = 0; k < cols; ++k) 
+			 {
+				 result(i, j) += data[i][k] * other(k, j);
+			 }
+		 }
+	 }
+	 return result;
+ }
+
+ Common::Matrix Common::Matrix::transpose() const
+ {
+	Matrix result(cols, rows);
+	for (size_t i = 0; i < rows; ++i) {
+		for (size_t j = 0; j < cols; ++j) {
+			result(j, i) = data[i][j];
+		}
+	}
+	return result;
+ }
+
+ void Common::Matrix::Log() const
+ {
+	 for (size_t i = 0; i < rows; ++i) 
+	 {
+		 for (size_t j = 0; j < cols; ++j) 
+		 {
+			 std::cout << data[i][j] << " ";
+		 }
+		 std::cout << std::endl;
+	 }
  }

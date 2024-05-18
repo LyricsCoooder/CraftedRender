@@ -20,7 +20,11 @@ namespace RenderApp
 	void RenderLineTreeUI(UIValue::UIValue& MainUIValue);
 	void RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 
+	void RenderTriangleTreeUI(UIValue::UIValue& MainUIValue);
+	void RenderTriangleTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
+
 	void RenderModelTreeUI(UIValue::UIValue& MainUIValue);
+	void RenderModelTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 	// Render View Port
 	void RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 }

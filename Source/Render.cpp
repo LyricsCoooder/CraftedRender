@@ -68,6 +68,18 @@ void Render::Renderer::RenderLine(Common::PixelPos Start, Common::PixelPos End, 
 	}
 }
 
+void Render::Renderer::RenderTriangle(Common::PixelPos Pos0, Common::PixelPos Pos1, Common::PixelPos Pos2, Common::Color Color)
+{
+	RenderLine(Pos0, Pos1, Color);
+	RenderLine(Pos1, Pos2, Color);
+	RenderLine(Pos0, Pos2, Color);
+}
+
+void Render::Renderer::RenderModel(Common::Model& Model)
+{
+
+}
+
 GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, int height)
 {
     GLuint textureID;
