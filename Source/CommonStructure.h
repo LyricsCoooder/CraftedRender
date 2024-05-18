@@ -125,6 +125,8 @@ namespace Common
 	{
 	public:
 		virtual ShaderType GetShaderType() = 0;
+		virtual void VertexShader() = 0;
+		virtual void FragmentShader() = 0;
 	};
 
 	class Model
