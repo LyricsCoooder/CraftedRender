@@ -48,9 +48,6 @@
     <ClCompile Include="Source\Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UIValue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\ImGuiFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

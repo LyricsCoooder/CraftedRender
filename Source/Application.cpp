@@ -109,7 +109,7 @@ void RenderApp::RenderPointTreeUI(UIValue::UIValue& MainUIValue)
     if (ImGui::Button("Add Point"))
     {
         MainUIValue.PointTreeSize++;
-        MainUIValue.PointTree.push_back(UIValue::Point());
+        MainUIValue.PointTree.push_back(Common::Point());
     }
 
     for (int i = 0; i < MainUIValue.PointTreeSize; i++)
@@ -137,10 +137,8 @@ void RenderApp::RenderPointTreeUI(UIValue::UIValue& MainUIValue)
 void RenderApp::RenderPointTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     // PointTree Render
-    for (UIValue::Point& Point : MainUIValue.PointTree)
+    for (Common::Point& Point : MainUIValue.PointTree)
     {
- /*       Common::PixelColor TempPixelColor = Common::PixelColor((int)Point.Pos[0], (int)Point.Pos[1],
-            Common::Color(Point.Color[0], Point.Color[1], Point.Color[2], Point.Color[3]));*/
         ViewportRender.AddToFrameBuffer(Common::PixelColor(Point.Pos, Point.Color));
     }
 }
@@ -152,7 +150,7 @@ void RenderApp::RenderLineTreeUI(UIValue::UIValue& MainUIValue)
     if (ImGui::Button("Add Line"))
     {
         MainUIValue.LineTreeSize++;
-        MainUIValue.LineTree.push_back(UIValue::Line());
+        MainUIValue.LineTree.push_back(Common::Line());
     }
 
     for (int i = 0; i < MainUIValue.LineTreeSize; i++)
@@ -181,7 +179,7 @@ void RenderApp::RenderLineTreeUI(UIValue::UIValue& MainUIValue)
 void RenderApp::RenderLineTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     // LineTree Render
-    for (UIValue::Line& Line : MainUIValue.LineTree)
+    for (Common::Line& Line : MainUIValue.LineTree)
     {
         ViewportRender.RenderLine(Line.StartPos, Line.EndPos, Line.Color);
     }
@@ -194,7 +192,7 @@ void RenderApp::RenderTriangleTreeUI(UIValue::UIValue& MainUIValue)
     if (ImGui::Button("Add Triangle"))
     {
         MainUIValue.TriangleTreeSize++;
-        MainUIValue.TriangleTree.push_back(UIValue::Triangle());
+        MainUIValue.TriangleTree.push_back(Common::Triangle());
     }
 
     for (int i = 0; i < MainUIValue.TriangleTreeSize; i++)
@@ -223,7 +221,7 @@ void RenderApp::RenderTriangleTreeUI(UIValue::UIValue& MainUIValue)
 
 void RenderApp::RenderTriangleTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
-    for (UIValue::Triangle& Triangle : MainUIValue.TriangleTree)
+    for (Common::Triangle& Triangle : MainUIValue.TriangleTree)
     {
         ViewportRender.RenderTriangle(Triangle.Pos0, Triangle.Pos1, Triangle.Pos2, Triangle.Color);
     }
@@ -317,14 +315,20 @@ void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& Vie
     ImGui::Begin("Sence");
 
     ViewportRender.ClearFrameBuffer();
+
     // RenderPointTreeToSense
     RenderPointTreeToSense(MainUIValue, ViewportRender);
+    
     // RenderLineTreeToSense
     RenderLineTreeToSense(MainUIValue, ViewportRender);
+    
     // RenderTriangleTreeToSense
     RenderTriangleTreeToSense(MainUIValue, ViewportRender);
+    
     // RenderModelTreeToSense
     RenderModelTreeToSense(MainUIValue, ViewportRender);
+
+    // FinalRender From FrameBuffer
     ViewportRender.FinalRender();
 
     ImGui::End();

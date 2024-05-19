@@ -19,7 +19,6 @@ Common::Color::Color(float R, float G, float B)
 	this->A = 1.0f;
 }
 
-
 Common::Color::Color(float R, float G, float B, float A)
 {
 	this->R = R;
@@ -375,6 +374,7 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 
  void Common::WireFrameShader::FragmentShader()
  {
+
  }
 
  Common::Transform::Transform()

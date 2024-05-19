@@ -151,7 +151,6 @@
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\CommonStructure.cpp" />
     <ClCompile Include="Source\Render.cpp" />
-    <ClCompile Include="Source\UIValue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\imgui_impl_glfw.h" />

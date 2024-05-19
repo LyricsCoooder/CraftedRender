@@ -6,6 +6,38 @@
 
 namespace Common
 {
+	/*
+	*	UI Part
+	*/  
+	// Point in Setting
+	struct Point
+	{
+		float Pos[2] = { 0.0f };
+		float Color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
+	// Line in Setting
+	struct Line
+	{
+		float StartPos[2] = { 0.0f };
+		float EndPos[2] = { 0.0f };
+		float Color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
+	// Triangle in Setting
+	struct Triangle
+	{
+		float Pos0[2] = { 0.0f };
+		float Pos1[2] = { 0.0f };
+		float Pos2[2] = { 0.0f };
+		float Color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	};
+
+	/*
+	*	Render Part
+	*/
+	
+	// Color in Render
 	class Color
 	{
 	public:
@@ -20,6 +52,7 @@ namespace Common
 		Color(float Color[4]);
 	};
 
+	// PixelPos in Render
 	class PixelPos
 	{
 	public:
@@ -31,6 +64,7 @@ namespace Common
 		PixelPos(float Pos[2]);
 	};
 
+	// PixelColor in Render, Used by FrameBuffer
 	class PixelColor
 	{
 	public:
@@ -42,24 +76,28 @@ namespace Common
 		PixelColor(int X, int Y, Common::Color Color);
 	};
 
+	// Vertex in Model
 	class Vertex
 	{
 	public:
 		float x, y, z;
 	};
 
+	// Normal in Model
 	class Normal
 	{
 	public:
 		float x, y, z;
 	};
 
+	// TexCoord in Model
 	class TexCoord
 	{
 	public:
 		float u, v;
 	};
 
+	// VertexIndex in Model
 	class VertexIndex
 	{
 	public:
@@ -68,6 +106,7 @@ namespace Common
 		VertexIndex(std::vector<int> Indexs);
 	};
 
+	// NormalIndex in Model
 	class NormalIndex
 	{
 	public:
@@ -76,6 +115,7 @@ namespace Common
 		NormalIndex(std::vector<int> Indexs);
 	};
 
+	// TexCoordIndex in Model
 	class TexCoordIndex
 	{
 	public:
@@ -84,6 +124,7 @@ namespace Common
 		TexCoordIndex(std::vector<int> Indexs);
 	};
 
+	// Matrix in Model
 	class Matrix
 	{
 	private:
@@ -117,6 +158,7 @@ namespace Common
 		void Log() const;
 	};
 
+	// Transform in Model
 	class Transform 
 	{
 	public:
@@ -136,15 +178,17 @@ namespace Common
 		void Log() const;
 	};
 
+	// ShaderType in Shader
 	enum ShaderType
 	{
 		NONE = 0,
 		WIREFRAME_SHADER
 	};
 
-
+	// Shader in Render
 	class Shader;
 
+	// Model in Render
 	class Model
 	{
 	public:
