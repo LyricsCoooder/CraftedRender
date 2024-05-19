@@ -30,7 +30,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "CraftedRender", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1270, 870, "CraftedRender", nullptr, nullptr);
     if (window == nullptr)
         return 1;
 
@@ -49,7 +49,10 @@ int main(int, char**)
     io.Fonts->AddFontFromFileTTF("./Font/Roboto-Bold.ttf", 20.0f);
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsClassic();
+    ImGui::StyleColorsDark();
+
+
+    ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 0.94f);
 
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     ImGuiStyle& style = ImGui::GetStyle();

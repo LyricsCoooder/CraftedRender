@@ -127,44 +127,42 @@ namespace Common
 	// Matrix in Model
 	class Matrix
 	{
-	private:
+	public:
 		std::vector<std::vector<float>> data;
 		size_t rows, cols;
 
-	public:
 		Matrix(size_t rows, size_t cols);
 
 		size_t getRows() const;
 
 		size_t getCols() const;
 
-		// 重载()操作符用于元素访问
 		float& operator()(size_t row, size_t col);
-		const float& operator()(size_t row, size_t col) const;
+		const  float& operator()(size_t row, size_t col) const;
 
-		// 矩阵加法
 		Matrix operator+(const Matrix& other) const;
 
-		// 矩阵减法
 		Matrix operator-(const Matrix& other) const;
 
-		// 矩阵乘法
 		Matrix operator*(const Matrix& other) const;
 
-		// 矩阵转置
 		Matrix transpose() const;
 
-		// 输出矩阵
+		Matrix inverse() const;
+
+		// identity
+		static Matrix identity(size_t n);
+
 		void Log() const;
 	};
 
 	// Transform in Model
-	class Transform 
+	class Transform
 	{
 	public:
-		float translation[3];
-		float rotation[3]; // Euler angles: (Pitch, Yaw, Roll)
-		float scale[3];
+		float Translation[3];
+		float Rotation[3]; // Euler angles: (Pitch, Yaw, Roll)
+		float Scale[3];
 
 	public:
 		Transform();
@@ -187,6 +185,9 @@ namespace Common
 
 	// Shader in Render
 	class Shader;
+	
+	// Camera
+	class Camera;
 
 	// Model in Render
 	class Model
@@ -200,28 +201,56 @@ namespace Common
 		std::vector<TexCoordIndex> TexCoordIndexs;
 		Matrix ModelMatrix = Matrix(4, 4);
 		Transform Transform;
-		Shader* ModelShader;
+		Shader* ModelShader = nullptr;
 
 		static Model readObj(std::string filename);
 
 		void LogModel();
 	};
 
+	// VertexShaderOutput
+	struct VertexShaderOutput
+	{
+		float VertexPosCVV[4];
+	};
+
+	// Base Shader
 	class Shader
 	{
 	public:
-		virtual ShaderType GetShaderType();
-		virtual void VertexShader(Model& Model);
-		virtual void FragmentShader();
+		virtual ShaderType GetShaderType() = 0;
+		virtual VertexShaderOutput VertexShader(Camera& Camera, Model& Model, int FaceIndex, int VertexIndex) = 0;
+		virtual VertexShaderOutput VertexShader(Camera& Camera, Model& Model, Vertex Vertex) = 0;
+		virtual void FragmentShader() = 0;
 	};
 
+	// WireFrame Mod Shader
 	class WireFrameShader :public Common::Shader
 	{
 	public:
 		ShaderType GetShaderType() override;
 
-		void VertexShader(Model& Model) override;
+		VertexShaderOutput VertexShader(Camera& Camera, Model& Model, int FaceIndex, int VertexIndex) override;
+		VertexShaderOutput VertexShader(Camera& Camera, Model& Model, Vertex Vertex);
 
 		void FragmentShader() override;
+	};
+
+	// Camera
+
+	class Camera
+	{
+	public:
+		Matrix CameraMatrix = Matrix(4, 4);
+		Matrix ViewMatrix = Matrix(4, 4);
+		Matrix PerspectiveMatrix = Matrix(4, 4);
+		Transform Transform;
+		float Fov;
+		float Ratio;
+		float N;
+		float F;
+
+		Camera();
+		Matrix SetPerspectiveMatrix();
 	};
 }

@@ -236,20 +236,16 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue, Render::Rendere
         ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Model", ".obj");
     }
 
-    // 显示文件对话框并处理选择结果
     if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
     {
-        // 如果用户选择了文件
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            // 获取选择的文件路径
             std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             std::cout << filePathName << std::endl;
             MainUIValue.ModelTree.push_back(Common::Model::readObj(filePathName));
             MainUIValue.ModelTreeSize++;
         }
 
-        // 关闭文件对话框
         ImGuiFileDialog::Instance()->Close();
     }
 
@@ -279,9 +275,12 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue, Render::Rendere
                 MainUIValue.ModelTree[i].ModelShader = &ViewportRender.WireFrameShader;
             }
             
-            ImGui::InputFloat3("Translation", MainUIValue.ModelTree[i].Transform.translation);
-            ImGui::InputFloat3("Rotation", MainUIValue.ModelTree[i].Transform.rotation);
-            ImGui::InputFloat3("Scale", MainUIValue.ModelTree[i].Transform.scale);
+            ImGui::SliderFloat3("Translation", MainUIValue.ModelTree[i].Transform.Translation, 0, 1000);
+ 
+            /*ImGui::InputFloat3("Rotation", MainUIValue.ModelTree[i].Transform.Rotation);*/
+            ImGui::SliderFloat3("Rotation", MainUIValue.ModelTree[i].Transform.Rotation, 0, 360);
+
+            ImGui::InputFloat3("Scale", MainUIValue.ModelTree[i].Transform.Scale);
             MainUIValue.ModelTree[i].ModelMatrix = MainUIValue.ModelTree[i].Transform.toMatrix();
 
             ImGui::Text("TexCoords Size: %d", MainUIValue.ModelTree[i].TexCoords.size());
@@ -328,6 +327,15 @@ void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& Vie
     // RenderModelTreeToSense
     RenderModelTreeToSense(MainUIValue, ViewportRender);
 
+    Common::PixelPos a = Common::PixelPos(0, 0);
+    Common::PixelPos b = Common::PixelPos(0, ViewportRender.SenceHight - 1);
+    Common::PixelPos c = Common::PixelPos(ViewportRender.SenceWidth - 1, 0);
+    Common::PixelPos d = Common::PixelPos(ViewportRender.SenceWidth - 1, ViewportRender.SenceHight - 1);
+    Common::Color W(1, 1, 1, 1);
+    ViewportRender.RenderLine(a, b, W);
+    ViewportRender.RenderLine(c, d, W);
+    ViewportRender.RenderLine(b, d, W);
+    ViewportRender.RenderLine(a, c, W);
     // FinalRender From FrameBuffer
     ViewportRender.FinalRender();
 

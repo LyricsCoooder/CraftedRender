@@ -1,4 +1,6 @@
 #include "Render.h"
+#include "iostream"
+#include <algorithm> 
 
 std::vector<Common::PixelColor> Render::Renderer::GetFrameBuffer()
 {
@@ -12,13 +14,23 @@ void Render::Renderer::ClearFrameBuffer()
 
 void Render::Renderer::AddToFrameBuffer(Common::PixelColor APixel)
 {
+	if (APixel.Pos.X < 0 || APixel.Pos.Y < 0)
+	{
+		return;
+	}
+	if (APixel.Pos.X > SenceWidth || APixel.Pos.Y > SenceHight)
+	{
+		return;
+	}
 	this->FrameBuffer.push_back(APixel);
 }
 
 void Render::Renderer::RenderLine(Common::PixelPos Start, Common::PixelPos End, Common::Color Color)
 {
-	int x0 = Start.X, x1 = End.X;
-	int y0 = Start.Y, y1 = End.Y;
+	int x0 = Start.X;
+	int	x1 = End.X;
+	int y0 = Start.Y;
+	int y1 = End.Y;
     bool KGreaterThanOne = abs(x0 - x1) < abs(y0 - y1);
 	
 	if (KGreaterThanOne)
@@ -52,6 +64,7 @@ void Render::Renderer::RenderLine(Common::PixelPos Start, Common::PixelPos End, 
 		if (KGreaterThanOne)
 		{
 			Common::PixelColor APixel(y0, index, Color);
+			
 			AddToFrameBuffer(APixel);
 		}
 		else
@@ -77,7 +90,52 @@ void Render::Renderer::RenderTriangle(Common::PixelPos Pos0, Common::PixelPos Po
 
 void Render::Renderer::RenderModel(Common::Model& Model)
 {
+	if (!Model.ModelShader)
+	{
+		return;
+	}
 
+	int Size = (int) Model.VertexIndexs.size();
+	for (int i = 0; i < Size; ++i)
+	{
+		Common::Vertex NDCVertexs[3];
+		Common::Vertex SencePosList[3];
+		for (int j = 0; j < 3; ++j)
+		{
+			Common::Vertex AimVertex = Model.Vertices[Model.VertexIndexs[i].Indexs[j]];
+			Common::VertexShaderOutput VertexShaderOutput = Model.ModelShader->VertexShader(RenderCamera, Model, AimVertex);
+			Common::Vertex NDCVertex;
+			
+			NDCVertex.x = VertexShaderOutput.VertexPosCVV[0] / VertexShaderOutput.VertexPosCVV[3];
+			NDCVertex.y = VertexShaderOutput.VertexPosCVV[1] / VertexShaderOutput.VertexPosCVV[3];
+			NDCVertex.z = VertexShaderOutput.VertexPosCVV[2] / VertexShaderOutput.VertexPosCVV[3];
+			
+			NDCVertexs[j] = NDCVertex;
+			SencePosList[j].x = SenceWidth * (NDCVertex.y + 1) * 0.5;
+			SencePosList[j].y = SenceWidth * (1 - NDCVertex.z) * 0.5;
+			SencePosList[j].z = VertexShaderOutput.VertexPosCVV[3];
+		}
+			
+		bool IsIsBackside = Backside(NDCVertexs) >= 0;
+
+		if (IsIsBackside)
+		{
+			Common::PixelPos Pos0(SencePosList[0].x, SencePosList[0].y);
+			Common::PixelPos Pos1(SencePosList[1].x, SencePosList[1].y);
+			Common::PixelPos Pos2(SencePosList[2].x, SencePosList[2].y);
+			RenderTriangle(Pos0, Pos1, Pos2, Common::Color(1, 1, 1, 1));
+		}
+	}
+}
+
+float Render::Renderer::Backside(Common::Vertex NDCVertexs[3])
+{
+	return NDCVertexs[0].y * NDCVertexs[2].z -
+		   NDCVertexs[0].z * NDCVertexs[2].y +
+		   NDCVertexs[0].z * NDCVertexs[1].y -
+		   NDCVertexs[0].y * NDCVertexs[1].z +
+		   NDCVertexs[2].y * NDCVertexs[1].z -
+		   NDCVertexs[1].y * NDCVertexs[2].z;
 }
 
 GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, int height)
@@ -99,13 +157,19 @@ GLuint Render::Renderer::CreateGradientTexture(unsigned char* data, int width, i
 void Render::Renderer::FinalRender()
 {
 	ImVec2 WindowSize = ImGui::GetWindowSize();
-    const int height = (int) WindowSize.y - 42;
-    const int width = (int) WindowSize.x - 16;
+    const int height = 800;
+    const int width = 800;
+
+	SenceHight = height;
+	SenceWidth = width;
     ImVec2 ImageSize = ImVec2((float)width, (float)height);
 	 
     int DataSize = height * width * 4;
     unsigned char* data = new unsigned char[DataSize] (); // RGBA∏Ò Ω
-
+	for (int i = 3; i < DataSize; i = i + 4)
+	{
+		data[i] = 255;
+	}
     // Render Pixel
     for (Common::PixelColor& APixel : FrameBuffer)
     {

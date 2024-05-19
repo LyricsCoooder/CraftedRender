@@ -4,3 +4,6 @@ CraftedRender
 
 Font
 Model.obj
+*.mtl
+Box.obj
+*.obj

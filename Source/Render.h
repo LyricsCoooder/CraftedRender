@@ -15,8 +15,14 @@ namespace Render
 		std::vector<Common::PixelColor> FrameBuffer;
 
 	public:
+		int SenceHight;
+		int SenceWidth;
+
 		// Render Used Shader
 		Common::WireFrameShader WireFrameShader;
+		
+		// Render Used Camera
+		Common::Camera RenderCamera;
 
 	public:
 		// GetFrameBuffer
@@ -36,6 +42,9 @@ namespace Render
 
 		// Add Model To FrameBuffer, Use Model Shader
 		void RenderModel(Common::Model& Model);
+
+		// BacksideRejected
+		float Backside(Common::Vertex NDCVertexs[3]);
 
 		// Redner Way is Render Texture in Gui
 		GLuint CreateGradientTexture(unsigned char* data, int width, int height);
