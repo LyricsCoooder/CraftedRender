@@ -14,6 +14,9 @@ namespace Render
 		std::vector<Common::PixelColor> FrameBuffer;
 
 	public:
+		Common::WireFrameShader WireFrameShader;
+
+	public:
 		// GetFrameBuffer
 		std::vector<Common::PixelColor> GetFrameBuffer();
 

@@ -2,6 +2,7 @@
 
 #include "vector"
 #include "string"
+#include "cmath"
 
 namespace Common
 {
@@ -83,9 +84,10 @@ namespace Common
 		TexCoordIndex(std::vector<int> Indexs);
 	};
 
-	class Matrix {
+	class Matrix
+	{
 	private:
-		std::vector<std::vector<double>> data;
+		std::vector<std::vector<float>> data;
 		size_t rows, cols;
 
 	public:
@@ -96,8 +98,8 @@ namespace Common
 		size_t getCols() const;
 
 		// 重载()操作符用于元素访问
-		double& operator()(size_t row, size_t col);
-		const double& operator()(size_t row, size_t col) const;
+		float& operator()(size_t row, size_t col);
+		const float& operator()(size_t row, size_t col) const;
 
 		// 矩阵加法
 		Matrix operator+(const Matrix& other) const;
@@ -115,19 +117,33 @@ namespace Common
 		void Log() const;
 	};
 
+	class Transform 
+	{
+	public:
+		float translation[3];
+		float rotation[3]; // Euler angles: (Pitch, Yaw, Roll)
+		float scale[3];
+
+	public:
+		Transform();
+
+		Transform(float tx, float ty, float tz, float pitch, float yaw, float roll, float sx, float sy, float sz);
+
+		Matrix toMatrix() const;
+
+		static Transform fromMatrix(const Matrix& mat);
+
+		void Log() const;
+	};
+
 	enum ShaderType
 	{
 		NONE = 0,
 		WIREFRAME_SHADER
 	};
 
-	class Shader
-	{
-	public:
-		virtual ShaderType GetShaderType() = 0;
-		virtual void VertexShader() = 0;
-		virtual void FragmentShader() = 0;
-	};
+
+	class Shader;
 
 	class Model
 	{
@@ -138,10 +154,30 @@ namespace Common
 		std::vector<VertexIndex> VertexIndexs;
 		std::vector<NormalIndex> NormalIndexs;
 		std::vector<TexCoordIndex> TexCoordIndexs;
-		Matrix ModelMatrix = Matrix(3, 4);
+		Matrix ModelMatrix = Matrix(4, 4);
+		Transform Transform;
+		Shader* ModelShader;
 
 		static Model readObj(std::string filename);
 
 		void LogModel();
+	};
+
+	class Shader
+	{
+	public:
+		virtual ShaderType GetShaderType();
+		virtual void VertexShader(Model& Model);
+		virtual void FragmentShader();
+	};
+
+	class WireFrameShader :public Common::Shader
+	{
+	public:
+		ShaderType GetShaderType() override;
+
+		void VertexShader(Model& Model) override;
+
+		void FragmentShader() override;
 	};
 }

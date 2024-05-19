@@ -7,7 +7,7 @@ void RenderApp::RenderUI(UIValue::UIValue& MainUIValue, Render::Renderer& Viewpo
     RenderDocking();
 
     // Render Settings
-    RenderSetting(MainUIValue);
+    RenderSetting(MainUIValue, ViewportRender);
 
     // Render Sense
     RenderSense(MainUIValue, ViewportRender);
@@ -85,7 +85,7 @@ void RenderApp::RenderDocking()
     ImGui::End();
 }
 
-void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
+void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Settings");
     // RenderPointTreeUI    
@@ -95,7 +95,7 @@ void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue)
     
     RenderTriangleTreeUI(MainUIValue);
 
-    RenderModelTreeUI(MainUIValue);
+    RenderModelTreeUI(MainUIValue, ViewportRender);
 
 
     ImGui::End();
@@ -229,7 +229,7 @@ void RenderApp::RenderTriangleTreeToSense(UIValue::UIValue& MainUIValue, Render:
     }
 }
 
-void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
+void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::SeparatorText("Models");
 
@@ -267,6 +267,25 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue)
             }
             ImGui::SameLine();
             bool RemoveButton = ImGui::Button("Remove");
+            
+            const char* items[] = { "None", "WireFrameShader" };
+            static int item_current = 0;
+            ImGui::Combo("Shader Type", &item_current, items, IM_ARRAYSIZE(items));
+
+            if (item_current == 0)
+            {
+                MainUIValue.ModelTree[i].ModelShader = nullptr;
+            }
+            else if (item_current == 1)
+            {
+                MainUIValue.ModelTree[i].ModelShader = &ViewportRender.WireFrameShader;
+            }
+            
+            ImGui::InputFloat3("Translation", MainUIValue.ModelTree[i].Transform.translation);
+            ImGui::InputFloat3("Rotation", MainUIValue.ModelTree[i].Transform.rotation);
+            ImGui::InputFloat3("Scale", MainUIValue.ModelTree[i].Transform.scale);
+            MainUIValue.ModelTree[i].ModelMatrix = MainUIValue.ModelTree[i].Transform.toMatrix();
+
             ImGui::Text("TexCoords Size: %d", MainUIValue.ModelTree[i].TexCoords.size());
             ImGui::Text("Normals Size: %d", MainUIValue.ModelTree[i].Normals.size());
             ImGui::Text("Vertices Size: %d", MainUIValue.ModelTree[i].Vertices.size());

@@ -197,6 +197,16 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 
 	 std::cout << "ModelMatrix:" << std::endl;
 	 ModelMatrix.Log();
+
+	 std::cout << "ShaderType: ";
+	 if (ModelShader)
+	 {
+		 std::cout << ModelShader->GetShaderType() << std::endl;
+	 }
+	 else
+	 {
+		 std::cout << 0 << std::endl;
+	 }
  }
 
  Common::VertexIndex::VertexIndex(std::vector<int> Indexs)
@@ -222,7 +232,7 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 
  Common::Matrix::Matrix(size_t rows, size_t cols) : rows(rows), cols(cols)
  {
-	 data.resize(rows, std::vector<double>(cols, 0.0));
+	 data.resize(rows, std::vector<float>(cols, 0.0));
  }
 
  size_t Common::Matrix::getRows() const
@@ -235,7 +245,7 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 	 return cols;
  }
 
- double& Common::Matrix::operator()(size_t row, size_t col)
+ float& Common::Matrix::operator()(size_t row, size_t col)
  {
 	 if (row >= rows || col >= cols) 
 	 {
@@ -244,7 +254,7 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 	 return data[row][col];
  }
 
- const double& Common::Matrix::operator()(size_t row, size_t col) const
+ const float& Common::Matrix::operator()(size_t row, size_t col) const
  {
 	 if (row >= rows || col >= cols)
 	 {
@@ -327,8 +337,172 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 	 {
 		 for (size_t j = 0; j < cols; ++j) 
 		 {
+			 if (data[i][j] == -0)
+			 {
+				 std::cout << 0 << " ";
+				 continue;
+			 }
 			 std::cout << data[i][j] << " ";
 		 }
 		 std::cout << std::endl;
 	 }
  }
+
+ Common::ShaderType Common::Shader::GetShaderType()
+ {
+	 return Common::ShaderType::NONE;
+ }
+
+ void Common::Shader::VertexShader(Model& Model)
+ {
+
+ }
+
+ void Common::Shader::FragmentShader()
+ {
+
+ }
+
+ Common::ShaderType Common::WireFrameShader::GetShaderType()
+ {
+	 return Common::ShaderType::WIREFRAME_SHADER;
+ }
+
+ void Common::WireFrameShader::VertexShader(Model& Model)
+ {
+
+ }
+
+ void Common::WireFrameShader::FragmentShader()
+ {
+ }
+
+ Common::Transform::Transform()
+ {
+	 translation[0] = translation[1] = translation[2] = 0.0;
+	 rotation[0] = rotation[1] = rotation[2] = 0.0;
+	 scale[0] = scale[1] = scale[2] = 1.0;
+ }
+
+ Common::Transform::Transform(float tx, float ty, float tz, float pitch, float yaw, float roll, float sx, float sy, float sz)
+ {
+	 translation[0] = tx;
+	 translation[1] = ty;
+	 translation[2] = tz;
+	 rotation[0] = pitch;
+	 rotation[1] = yaw;
+	 rotation[2] = roll;
+	 scale[0] = sx;
+	 scale[1] = sy;
+	 scale[2] = sz;
+ }
+
+Common::Matrix Common::Transform::toMatrix() const
+ {
+	const double PI = 3.14159265358979323846;
+
+	const double DEG_TO_RAD = PI / 180.0;
+	const double RADS_DIVIDED_BY_2 = DEG_TO_RAD / 2.0;
+
+	double PitchNoWinding = fmod(rotation[1], 360.0);
+	double YawNoWinding = fmod(rotation[2], 360.0);
+	double RollNoWinding = fmod(rotation[0], 360.0);
+
+	double SP = sin(PitchNoWinding * RADS_DIVIDED_BY_2);
+	double CP = cos(PitchNoWinding * RADS_DIVIDED_BY_2);
+	double SY = sin(YawNoWinding * RADS_DIVIDED_BY_2);
+	double CY = cos(YawNoWinding * RADS_DIVIDED_BY_2);
+	double SR = sin(RollNoWinding * RADS_DIVIDED_BY_2);
+	double CR = cos(RollNoWinding * RADS_DIVIDED_BY_2);
+
+	float W = CR * CP * CY + SR * SP * SY;
+	float X = CR * SP * SY - SR * CP * CY;
+	float Y = -CR * SP * CY - SR * CP * SY;
+	float Z = CR * CP * SY - SR * SP * CY;
+
+	float yy2 = Y * Y * 2;
+	float zz2 = Z * Z * 2;
+	float xy2 = X * Y * 2;
+	float wz2 = W * Z * 2;
+	float xz2 = X * Z * 2;
+	float wy2 = W * Y * 2;
+	float yz2 = Y * Z * 2;
+	float wx2 = W * X * 2;
+	float xx2 = X * X * 2;
+
+	Matrix result(4, 4);
+
+	result(0, 0) = (1.0f - (yy2 + zz2)) * scale[0];
+	result(0, 1) = (xy2 + wz2) * scale[0];
+	result(0, 2) = (xz2 - wy2) * scale[0];
+	result(0, 3) = 0.0f;
+
+	result(1, 0) = (xy2 - wz2) * scale[1];
+	result(1, 1) = (1.0f - (xx2 + zz2)) * scale[1];
+	result(1, 2) = (yz2 + wx2) * scale[1];
+	result(1, 3) = 0.0f;
+
+	result(2, 0) = (xz2 + wy2) * scale[2];
+	result(2, 1) = (yz2 - wx2) * scale[2];
+	result(2, 2) = (1.0f - (xx2 + yy2)) * scale[2];
+	result(2, 3) = 0.0f;
+
+
+	result(3, 0) = translation[0];
+	result(3, 1) = translation[1];
+	result(3, 2) = translation[2];
+	result(3, 3) = 1.0f;
+
+	return result;
+ }
+
+Common::Transform Common::Transform::fromMatrix(const Matrix& mat)
+{
+	if (mat.getRows() != 4 || mat.getCols() != 4) {
+		throw std::invalid_argument("Matrix must be 4x4.");
+	}
+
+	Transform transform;
+
+	// 提取平移
+	transform.translation[0] = mat(0, 3);
+	transform.translation[1] = mat(1, 3);
+	transform.translation[2] = mat(2, 3);
+
+	// 提取缩放
+	transform.scale[0] = std::sqrt(mat(0, 0) * mat(0, 0) + mat(0, 1) * mat(0, 1) + mat(0, 2) * mat(0, 2));
+	transform.scale[1] = std::sqrt(mat(1, 0) * mat(1, 0) + mat(1, 1) * mat(1, 1) + mat(1, 2) * mat(1, 2));
+	transform.scale[2] = std::sqrt(mat(2, 0) * mat(2, 0) + mat(2, 1) * mat(2, 1) + mat(2, 2) * mat(2, 2));
+
+	// 提取旋转矩阵（缩放除以）
+	Matrix rotationMatrix(3, 3);
+	rotationMatrix(0, 0) = mat(0, 0) / transform.scale[0];
+	rotationMatrix(0, 1) = mat(0, 1) / transform.scale[0];
+	rotationMatrix(0, 2) = mat(0, 2) / transform.scale[0];
+	rotationMatrix(1, 0) = mat(1, 0) / transform.scale[1];
+	rotationMatrix(1, 1) = mat(1, 1) / transform.scale[1];
+	rotationMatrix(1, 2) = mat(1, 2) / transform.scale[1];
+	rotationMatrix(2, 0) = mat(2, 0) / transform.scale[2];
+	rotationMatrix(2, 1) = mat(2, 1) / transform.scale[2];
+	rotationMatrix(2, 2) = mat(2, 2) / transform.scale[2];
+
+	// 提取欧拉角
+	transform.rotation[1] = std::asin(-rotationMatrix(0, 2));
+	if (std::cos(transform.rotation[1]) != 0) {
+		transform.rotation[0] = std::atan2(rotationMatrix(1, 2), rotationMatrix(2, 2));
+		transform.rotation[2] = std::atan2(rotationMatrix(0, 1), rotationMatrix(0, 0));
+	}
+	else {
+		transform.rotation[0] = std::atan2(-rotationMatrix(2, 0), rotationMatrix(1, 1));
+		transform.rotation[2] = 0;
+	}
+
+	return transform;
+}
+
+void Common::Transform::Log() const
+{
+	std::cout << "Translation: (" << translation[0] << ", " << translation[1] << ", " << translation[2] << ")\n";
+	std::cout << "Rotation: (" << rotation[0] << ", " << rotation[1] << ", " << rotation[2] << ")\n";
+	std::cout << "Scale: (" << scale[0] << ", " << scale[1] << ", " << scale[2] << ")\n";
+}

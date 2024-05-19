@@ -1,6 +1,5 @@
 #pragma once
 
-#include "vector"
 #include "CommonStructure.h"
 
 namespace UIValue
@@ -44,7 +43,5 @@ namespace UIValue
 		// ModelTree
 		std::vector<Common::Model> ModelTree;
 		int ModelTreeSize = 0;
-	public:
-		UIValue();
 	};
 }

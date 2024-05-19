@@ -11,7 +11,7 @@ namespace RenderApp
 	// Render Doking
 	void RenderDocking();
 	// Setting 
-	void RenderSetting(UIValue::UIValue& MainUIValue);
+	void RenderSetting(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 	// Render PointTree UI
 	void RenderPointTreeUI(UIValue::UIValue& MainUIValue);
 	// Render PointTree To Sense
@@ -23,7 +23,7 @@ namespace RenderApp
 	void RenderTriangleTreeUI(UIValue::UIValue& MainUIValue);
 	void RenderTriangleTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 
-	void RenderModelTreeUI(UIValue::UIValue& MainUIValue);
+	void RenderModelTreeUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 	void RenderModelTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 	// Render View Port
 	void RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
