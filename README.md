@@ -2,7 +2,7 @@
 
 CraftedRender是一个主要基于DearImGui，手写渲染管线的练习项目，用于渲染管线，计算机图形学的学习与理解。
 
-![Main Structure](Doc\MainStructure.png)
+![Main](https://github.com/LyricsCoooder/CraftedRender/assets/120447121/c51220ba-1f95-4553-885b-2d3b6159a1fd)
 
 **模块：**
 
