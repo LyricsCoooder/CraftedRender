@@ -41,6 +41,9 @@ namespace RenderApp
 	// Render RenderModelTreeUI to Sense
 	void RenderModelTreeToSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 
+	// Render CameraUI to Setting
+	void RenderCameraUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
+
 	// Render View Port
 	void RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender);
 }

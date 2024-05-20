@@ -81,6 +81,9 @@ namespace Common
 	{
 	public:
 		float x, y, z;
+
+		Vertex();
+		Vertex(float _x, float _y, float _z);
 	};
 
 	// Normal in Model
@@ -193,6 +196,12 @@ namespace Common
 	class Model
 	{
 	public:
+		Vertex Axis[3] = {
+			Vertex(2, 0, 0),
+			Vertex(0, 2, 0),
+			Vertex(0, 0, 2)
+		};
+
 		std::vector<Vertex> Vertices;
 		std::vector<Normal> Normals;
 		std::vector<TexCoord> TexCoords;
@@ -202,6 +211,8 @@ namespace Common
 		Matrix ModelMatrix = Matrix(4, 4);
 		Transform Transform;
 		Shader* ModelShader = nullptr;
+		bool AxisIsShow = true;
+
 
 		static Model readObj(std::string filename);
 
@@ -252,5 +263,6 @@ namespace Common
 
 		Camera();
 		Matrix SetPerspectiveMatrix();
+		void UpdateCamera();
 	};
 }

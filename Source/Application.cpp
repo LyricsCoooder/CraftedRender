@@ -88,6 +88,8 @@ void RenderApp::RenderDocking()
 void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Settings");
+
+    RenderCameraUI(MainUIValue, ViewportRender);
     // RenderPointTreeUI    
     RenderPointTreeUI(MainUIValue);
     // RenderTreeUI
@@ -274,11 +276,11 @@ void RenderApp::RenderModelTreeUI(UIValue::UIValue& MainUIValue, Render::Rendere
             {
                 MainUIValue.ModelTree[i].ModelShader = &ViewportRender.WireFrameShader;
             }
-            
-            ImGui::SliderFloat3("Translation", MainUIValue.ModelTree[i].Transform.Translation, 0, 1000);
+            ImGui::Checkbox("Show Axis", &MainUIValue.ModelTree[i].AxisIsShow);
+
+            ImGui::InputFloat3("Translation", MainUIValue.ModelTree[i].Transform.Translation);
  
-            /*ImGui::InputFloat3("Rotation", MainUIValue.ModelTree[i].Transform.Rotation);*/
-            ImGui::SliderFloat3("Rotation", MainUIValue.ModelTree[i].Transform.Rotation, 0, 360);
+            ImGui::SliderFloat3("Rotation", MainUIValue.ModelTree[i].Transform.Rotation, -360, 360);
 
             ImGui::InputFloat3("Scale", MainUIValue.ModelTree[i].Transform.Scale);
             MainUIValue.ModelTree[i].ModelMatrix = MainUIValue.ModelTree[i].Transform.toMatrix();
@@ -309,6 +311,20 @@ void RenderApp::RenderModelTreeToSense(UIValue::UIValue& MainUIValue, Render::Re
     }
 }
 
+void RenderApp::RenderCameraUI(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
+{
+    ImGui::SeparatorText("Camera Setting");
+
+    ImGui::InputFloat3("Translation", ViewportRender.RenderCamera.Transform.Translation);
+    ImGui::SliderFloat3("Rotation", ViewportRender.RenderCamera.Transform.Rotation, -360, 360);
+    ImGui::InputFloat3("Scale", ViewportRender.RenderCamera.Transform.Scale);
+    
+    ImGui::Text("Fov: %f", ViewportRender.RenderCamera.Fov);
+    ImGui::Text("Ratio: %f", ViewportRender.RenderCamera.Ratio);
+    ImGui::Text("F: %f", ViewportRender.RenderCamera.F);
+    ImGui::Text("N: %f", ViewportRender.RenderCamera.N);
+}
+
 void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& ViewportRender)
 {
     ImGui::Begin("Sence");
@@ -327,15 +343,12 @@ void RenderApp::RenderSense(UIValue::UIValue& MainUIValue, Render::Renderer& Vie
     // RenderModelTreeToSense
     RenderModelTreeToSense(MainUIValue, ViewportRender);
 
-    Common::PixelPos a = Common::PixelPos(0, 0);
-    Common::PixelPos b = Common::PixelPos(0, ViewportRender.SenceHight - 1);
-    Common::PixelPos c = Common::PixelPos(ViewportRender.SenceWidth - 1, 0);
-    Common::PixelPos d = Common::PixelPos(ViewportRender.SenceWidth - 1, ViewportRender.SenceHight - 1);
-    Common::Color W(1, 1, 1, 1);
-    ViewportRender.RenderLine(a, b, W);
-    ViewportRender.RenderLine(c, d, W);
-    ViewportRender.RenderLine(b, d, W);
-    ViewportRender.RenderLine(a, c, W);
+    ImVec2 WindowSize = ImGui::GetWindowSize();
+    const int width = WindowSize.x - 15;
+    const int height = WindowSize.y - 42;
+    ViewportRender.RenderCamera.Ratio = (float)width / (float)height;
+    ViewportRender.RenderCamera.UpdateCamera();
+
     // FinalRender From FrameBuffer
     ViewportRender.FinalRender();
 

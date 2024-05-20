@@ -87,13 +87,15 @@ Common::PixelColor::PixelColor(int X, int Y, Common::Color Color)
 		if (prefix == "v") 
 		{
 			Vertex vertex;
-			ss >> vertex.x >> vertex.y >> vertex.z;
+			// x -> y y -> z z -> x
+			ss >> vertex.y >> vertex.z >> vertex.x;
 			AnsModel.Vertices.push_back(vertex);
 		}
 		else if (prefix == "vn") 
 		{
 			Normal normal;
-			ss >> normal.x >> normal.y >> normal.z;
+			// x -> y y -> z z -> x
+			ss >> normal.y >> normal.z >> normal.x;
 			AnsModel.Normals.push_back(normal);
 		}
 		else if (prefix == "vt") 
@@ -606,9 +608,8 @@ Common::Camera::Camera()
 {
 	Transform = Common::Transform(-10, 0, 0, 0, 0, 0, 1, 1, 1);
 	CameraMatrix = Transform.toMatrix();
-	CameraMatrix.Log();
 	ViewMatrix = CameraMatrix.inverse();
-	ViewMatrix.Log();
+
 	Fov = 120;
 	Ratio = 1;
 	N = 10;
@@ -636,4 +637,23 @@ Common::Matrix Common::Camera::SetPerspectiveMatrix()
 	Result(3, 0) = -1 * F * N / (F - N);
 
 	return Result;
+}
+
+void Common::Camera::UpdateCamera()
+{
+	CameraMatrix = Transform.toMatrix();
+	ViewMatrix = CameraMatrix.inverse();
+	PerspectiveMatrix = SetPerspectiveMatrix();
+}
+
+Common::Vertex::Vertex()
+{
+
+}
+
+Common::Vertex::Vertex(float _x, float _y, float _z)
+{
+	x = _x;
+	y = _y;
+	z = _z;
 }
