@@ -90,12 +90,17 @@ void RenderApp::RenderSetting(UIValue::UIValue& MainUIValue, Render::Renderer& V
     ImGui::Begin("Settings");
 
     RenderCameraUI(MainUIValue, ViewportRender);
-    // RenderPointTreeUI    
-    RenderPointTreeUI(MainUIValue);
-    // RenderTreeUI
-    RenderLineTreeUI(MainUIValue);
-    
-    RenderTriangleTreeUI(MainUIValue);
+
+    bool BaseUI = false;
+    if (BaseUI)
+    {
+        // RenderPointTreeUI    
+        RenderPointTreeUI(MainUIValue);
+        // RenderTreeUI
+        RenderLineTreeUI(MainUIValue);
+
+        RenderTriangleTreeUI(MainUIValue);
+    }
 
     RenderModelTreeUI(MainUIValue, ViewportRender);
 

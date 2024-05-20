@@ -648,7 +648,9 @@ void Common::Camera::UpdateCamera()
 
 Common::Vertex::Vertex()
 {
-
+	x = 0;
+	y = 0;
+	z = 0;
 }
 
 Common::Vertex::Vertex(float _x, float _y, float _z)

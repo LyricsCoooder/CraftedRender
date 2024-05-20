@@ -197,9 +197,9 @@ namespace Common
 	{
 	public:
 		Vertex Axis[3] = {
-			Vertex(2, 0, 0),
-			Vertex(0, 2, 0),
-			Vertex(0, 0, 2)
+			Vertex(1, 0, 0),
+			Vertex(0, 1, 0),
+			Vertex(0, 0, 1)
 		};
 
 		std::vector<Vertex> Vertices;
@@ -211,7 +211,7 @@ namespace Common
 		Matrix ModelMatrix = Matrix(4, 4);
 		Transform Transform;
 		Shader* ModelShader = nullptr;
-		bool AxisIsShow = true;
+		bool AxisIsShow = false;
 
 
 		static Model readObj(std::string filename);

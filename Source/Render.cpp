@@ -88,6 +88,30 @@ void Render::Renderer::RenderTriangle(Common::PixelPos Pos0, Common::PixelPos Po
 	RenderLine(Pos0, Pos2, Color);
 }
 
+void Render::Renderer::RenderModelTriangle(Common::Model& Model, int& FaceIndex, Common::PixelPos Pos0, Common::PixelPos Pos1, Common::PixelPos Pos2, Common::Color Color)
+{
+	int* LineIndexs = Model.VertexIndexs[FaceIndex].Indexs;
+
+	uint64_t I01 = RenderedLines.count(((uint64_t)LineIndexs[0] << 32) | (uint32_t)LineIndexs[1]);
+	if (I01 == 0)
+	{
+		RenderLine(Pos0, Pos1, Color);
+		RenderedLines.insert(I01);
+	}
+	uint64_t I02 = RenderedLines.count(((uint64_t)LineIndexs[0] << 32) | (uint32_t)LineIndexs[2]);
+	if (I02 == 0)
+	{
+		RenderLine(Pos0, Pos2, Color);
+		RenderedLines.insert(I02);
+	}
+	uint64_t I12 = RenderedLines.count(((uint64_t)LineIndexs[1] << 32) | (uint32_t)LineIndexs[2]);
+	if (I12 == 0)
+	{
+		RenderLine(Pos1, Pos2, Color);
+		RenderedLines.insert(I12);
+	}
+}
+
 void Render::Renderer::RenderModel(Common::Model& Model)
 {
 	if (!Model.ModelShader)
@@ -96,72 +120,83 @@ void Render::Renderer::RenderModel(Common::Model& Model)
 	}
 
 	int Size = (int) Model.VertexIndexs.size();
+	Common::Color ModelColor = Common::Color(1, 1, 1, 1);
+	RenderedLines.clear();
+
 	for (int i = 0; i < Size; ++i)
 	{
-		Common::Vertex NDCVertexs[3];
-		Common::Vertex SencePosList[3];
-		for (int j = 0; j < 3; ++j)
-		{
-			Common::Vertex AimVertex = Model.Vertices[Model.VertexIndexs[i].Indexs[j]];
-			Common::VertexShaderOutput VertexShaderOutput = Model.ModelShader->VertexShader(RenderCamera, Model, AimVertex);
-			Common::Vertex NDCVertex;
-			
-			NDCVertex.x = VertexShaderOutput.VertexPosCVV[0] / VertexShaderOutput.VertexPosCVV[3];
-			NDCVertex.y = VertexShaderOutput.VertexPosCVV[1] / VertexShaderOutput.VertexPosCVV[3];
-			NDCVertex.z = VertexShaderOutput.VertexPosCVV[2] / VertexShaderOutput.VertexPosCVV[3];
-			
-			NDCVertexs[j] = NDCVertex;
-			SencePosList[j].x = SenceWidth * (NDCVertex.y + 1) * 0.5;
-			SencePosList[j].y = SenceHight * (1 - NDCVertex.z) * 0.5;
-			SencePosList[j].z = VertexShaderOutput.VertexPosCVV[3];
-		}
-			
-		bool IsIsBackside = Backside(NDCVertexs) >= 0;
+		RenderModelFace(Model, i, ModelColor);
 
-		if (IsIsBackside)
-		{
-			Common::PixelPos Pos0(SencePosList[0].x, SencePosList[0].y);
-			Common::PixelPos Pos1(SencePosList[1].x, SencePosList[1].y);
-			Common::PixelPos Pos2(SencePosList[2].x, SencePosList[2].y);
-			RenderTriangle(Pos0, Pos1, Pos2, Common::Color(1, 1, 1, 1));
-		}
-
+		// Render AxisIsShow
 		if (Model.AxisIsShow)
 		{
 			Common::VertexShaderOutput Begin = Model.ModelShader->VertexShader(RenderCamera, Model, Common::Vertex(0, 0, 0));
-			Common::Vertex NDCVertexBegin;
-			NDCVertexBegin.x = Begin.VertexPosCVV[0] / Begin.VertexPosCVV[3];
-			NDCVertexBegin.y = Begin.VertexPosCVV[1] / Begin.VertexPosCVV[3];
-			NDCVertexBegin.z = Begin.VertexPosCVV[2] / Begin.VertexPosCVV[3];
-
-			Common::Vertex BeginSencePos;
-			BeginSencePos.x = SenceWidth * (NDCVertexBegin.y + 1) * 0.5;
-			BeginSencePos.y = SenceHight * (1 - NDCVertexBegin.z) * 0.5;
-			BeginSencePos.z = Begin.VertexPosCVV[3];
-
+			Common::Vertex NDCVertexBegin = DivideW(Begin);
+			Common::Vertex BeginSencePos = NDCVertexToSecen(NDCVertexBegin, Begin.VertexPosCVV[3]);
 			Common::PixelPos B(BeginSencePos.x, BeginSencePos.y);
 
 			for (int j = 0; j < 3; ++j)
 			{
 				Common::VertexShaderOutput End = Model.ModelShader->VertexShader(RenderCamera, Model, Model.Axis[j]);
-				Common::Vertex NDCVertexEnd;
-				NDCVertexEnd.x = End.VertexPosCVV[0] / End.VertexPosCVV[3];
-				NDCVertexEnd.y = End.VertexPosCVV[1] / End.VertexPosCVV[3];
-				NDCVertexEnd.z = End.VertexPosCVV[2] / End.VertexPosCVV[3];
-
-				Common::Vertex EndSencePos;
-				EndSencePos.x = SenceWidth * (NDCVertexEnd.y + 1) * 0.5;
-				EndSencePos.y = SenceHight * (1 - NDCVertexEnd.z) * 0.5;
-				EndSencePos.z = End.VertexPosCVV[3];
-
+				Common::Vertex NDCVertexEnd = DivideW(End);
+				Common::Vertex EndSencePos = NDCVertexToSecen(NDCVertexEnd, End.VertexPosCVV[3]);
 				Common::PixelPos E(EndSencePos.x, EndSencePos.y);
-
 				RenderLine(B, E, Common::Color(Model.Axis[j].x, Model.Axis[j].y, Model.Axis[j].z));
 			}
-
-			
 		}
 	}
+}
+
+void Render::Renderer::RenderModelFace(Common::Model& Model, int& FaceIndex, Common::Color& Color)
+{
+	Common::Vertex NDCVertexs[3];
+	Common::Vertex SencePosList[3];
+	std::string LineKeys[3];
+	for (int j = 0; j < 3; ++j)
+	{
+		Common::Vertex AimVertex = Model.Vertices[Model.VertexIndexs[FaceIndex].Indexs[j]];
+
+		// 顶点着色器 生成 CVV Vertex
+		Common::VertexShaderOutput VertexShaderOutput = Model.ModelShader->VertexShader(RenderCamera, Model, AimVertex);
+
+		// 透视除法
+		Common::Vertex NDCVertex = DivideW(VertexShaderOutput);
+
+		NDCVertexs[j] = NDCVertex;
+		// 屏幕映射
+		SencePosList[j] = NDCVertexToSecen(NDCVertex, VertexShaderOutput.VertexPosCVV[3]);
+	}
+
+	// 背面剔除
+	bool IsIsBackside = Backside(NDCVertexs) >= 0;
+
+	if (IsIsBackside)
+	{
+		Common::PixelPos Pos0(SencePosList[0].x, SencePosList[0].y);
+		Common::PixelPos Pos1(SencePosList[1].x, SencePosList[1].y);
+		Common::PixelPos Pos2(SencePosList[2].x, SencePosList[2].y);
+		RenderModelTriangle(Model, FaceIndex, Pos0, Pos1, Pos2, Color);
+	}
+}
+
+Common::Vertex Render::Renderer::DivideW(Common::VertexShaderOutput& VertexShaderOutput)
+{
+	Common::Vertex NDCVertex;
+	NDCVertex.x = VertexShaderOutput.VertexPosCVV[0] / VertexShaderOutput.VertexPosCVV[3];
+	NDCVertex.y = VertexShaderOutput.VertexPosCVV[1] / VertexShaderOutput.VertexPosCVV[3];
+	NDCVertex.z = VertexShaderOutput.VertexPosCVV[2] / VertexShaderOutput.VertexPosCVV[3];
+
+	return NDCVertex;
+}
+
+Common::Vertex Render::Renderer::NDCVertexToSecen(Common::Vertex& NDCVertex, float& Deep)
+{
+	Common::Vertex SencePos;
+	SencePos.x = SenceWidth * (NDCVertex.y + 1) * 0.5;
+	SencePos.y = SenceHight * (1 - NDCVertex.z) * 0.5;
+	SencePos.z = Deep;
+
+	return SencePos;
 }
 
 float Render::Renderer::Backside(Common::Vertex NDCVertexs[3])

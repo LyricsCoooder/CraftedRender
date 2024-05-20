@@ -3,6 +3,7 @@
 
 #include "CommonStructure.h"
 #include "vector"
+#include "set"
 #include "imgui.h"
 #include "GLFW/glfw3.h"
 
@@ -13,7 +14,7 @@ namespace Render
 	private:
 		// Render from FrameBuffer
 		std::vector<Common::PixelColor> FrameBuffer;
-
+		std::set<uint64_t> RenderedLines;
 	public:
 		int SenceHight;
 		int SenceWidth;
@@ -42,6 +43,18 @@ namespace Render
 
 		// Add Model To FrameBuffer, Use Model Shader
 		void RenderModel(Common::Model& Model);
+
+		// RenderModelFace
+		void RenderModelFace(Common::Model& Model, int& FaceIndex, Common::Color& Color);
+
+		// Add Model Triangle
+		void RenderModelTriangle(Common::Model& Model, int& FaceIndex, Common::PixelPos Pos0, Common::PixelPos Pos1, Common::PixelPos Pos2, Common::Color Color);
+
+		// Divide by W
+		Common::Vertex DivideW(Common::VertexShaderOutput& VertexShaderOutput);
+
+		// NDCVertexToSecen
+		Common::Vertex NDCVertexToSecen(Common::Vertex& NDCVertex, float& Deep);
 
 		// BacksideRejected
 		float Backside(Common::Vertex NDCVertexs[3]);
